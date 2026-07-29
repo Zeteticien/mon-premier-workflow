@@ -1,0 +1,38 @@
+name: Gestion des Artefacts
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  generate-file:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cloner le dépôt GitHub
+        uses: actions/checkout@v4
+
+      - name: Générer un fichier texte
+        run: echo "Ceci est un artefact généré automatiquement !" > output.txt
+
+      - name: Sauvegarder le fichier en tant qu’artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fichier-genere
+          path: output.txt
+
+  use-artifact:
+    runs-on: ubuntu-latest
+    needs: generate-file
+
+    steps:
+      - name: Télécharger l’artefact stocké
+        uses: actions/download-artifact@v4
+        with:
+          name: fichier-genere
+          path: ./artifacts
+
+      - name: Lire le contenu de l’artefact
+        run: cat ./artifacts/output.txt
