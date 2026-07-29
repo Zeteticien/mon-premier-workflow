@@ -1,0 +1,17 @@
+name: Commit Message
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  display-commit-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Display last commit message
+        run: echo "Dernier message de commit : $(git log -1 --pretty=%B)"
