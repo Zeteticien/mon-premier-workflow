@@ -1,2 +1,1 @@
-![Statut du projet](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Zeteticien/mon-premier-workflow
-/main/badges/badge.json)
+![Statut du projet](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Zeteticien/mon-premier-workflow/main/badges/badge.json)
