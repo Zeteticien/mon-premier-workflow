@@ -1,64 +1,45 @@
-# 🏷️ Nom du workflow
-name: Mise à jour du badge
- 
-# 🎯 Déclencheurs
+name: Update commit badge
+
 on:
   push:
-    branches: [main]
-    paths-ignore:
-      - 'badges/**'          # ⚠️ évite que le workflow se relance sur son propre commit
+    branches:
+      - main
   schedule:
-    - cron: "0 * * * *"      # toutes les heures (UTC)
-  workflow_dispatch:         # bouton manuel, pratique pour tester
- 
-# 🔐 Le workflow doit ÉCRIRE dans le dépôt (commit + push)
+    - cron: "17 * * * *"
+
 permissions:
   contents: write
- 
+
 jobs:
   update-badge:
     runs-on: ubuntu-latest
+
     steps:
-      - name: 📥 Cloner le dépôt
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          # ⚠️ INDISPENSABLE : par défaut, checkout ne télécharge qu'UN seul commit.
-          # Sans cette ligne, "git rev-list --count HEAD" répondrait toujours 1.
           fetch-depth: 0
- 
-      - name: 🔢 Compter le nombre de commits
-        id: compte
-        run: echo "total=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
- 
-      - name: 🎨 Mettre à jour le fichier du badge
-        env:
-          TOTAL: ${{ steps.compte.outputs.total }}
+
+      - name: Count commits
+        id: count
+        run: echo "commits=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Update badge file
         run: |
           mkdir -p badges
-          # jq écrit le JSON proprement (guillemets et échappements gérés).
-          jq -n --arg total "$TOTAL" '{
-            schemaVersion: 1,
-            label: "Commits",
-            message: $total,
-            color: "blue"
-          }' > badges/badge.json
-          cat badges/badge.json
- 
-      - name: 💾 Committer et pousser (seulement si ça a changé)
+          cat > badges/badge.json <<EOF
+          {
+            "schemaVersion": 1,
+            "label": "commits",
+            "message": "${{ steps.count.outputs.commits }}",
+            "color": "blue"
+          }
+          EOF
+
+      - name: Commit and push
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
- 
-          # Sans ce test, "git commit" échoue quand rien n'a changé
-          # et le workflow s'afficherait en ROUGE sans raison.
-          if git diff --quiet -- badges/badge.json; then
-            echo "✅ Badge déjà à jour, rien à pousser."
-            exit 0
-          fi
- 
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add badges/badge.json
-          git commit -m "chore: mise à jour automatique du badge [skip ci]"
+          git commit -m "Update commit badge [skip ci]" || exit 0
           git push
-          echo "✅ Badge mis à jour : $TOTAL commits"
-        env:
-          TOTAL: ${{ steps.compte.outputs.total }}
