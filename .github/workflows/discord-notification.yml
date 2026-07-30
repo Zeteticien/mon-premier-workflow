@@ -1,39 +1,76 @@
-name: Discord Notification
+name: Generate Image And Notify Discord
 
 on:
   push:
 
+permissions:
+  contents: write
+
 jobs:
-  notify:
+  generate-and-notify:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download artifact image-generee
-        uses: actions/download-artifact@v4
-        with:
-          name: image-generee
-          path: ./artifacts
-
-      - name: Get image name
-        id: image
+      - name: Préparer les dossiers
         run: |
-          IMAGE_NAME=$(ls ./artifacts | head -n 1)
+          mkdir -p artifacts
+          mkdir -p docs
+
+      - name: Générer une image avec nom dynamique
+        run: |
+          IMAGE_NAME="image-$(date +%Y%m%d-%H%M%S).svg"
+          cat > "artifacts/$IMAGE_NAME" <<EOF
+          <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+            <rect width="1200" height="630" fill="#0f172a"/>
+            <rect x="60" y="60" width="1080" height="510" rx="24" fill="#111827" stroke="#334155" stroke-width="2"/>
+            <text x="80" y="180" fill="#f8fafc" font-size="64" font-family="Arial, sans-serif" font-weight="bold">
+              Image générée par GitHub Actions
+            </text>
+            <text x="80" y="280" fill="#cbd5e1" font-size="32" font-family="Arial, sans-serif">
+              Commit : ${{ github.event.head_commit.message }}
+            </text>
+            <text x="80" y="340" fill="#94a3b8" font-size="28" font-family="Arial, sans-serif">
+              Repo : ${{ github.repository }}
+            </text>
+            <text x="80" y="400" fill="#94a3b8" font-size="28" font-family="Arial, sans-serif">
+              Généré le : $(date '+%Y-%m-%d %H:%M:%S UTC')
+            </text>
+          </svg>
+          EOF
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
-      - name: Build image URL
+      - name: Copier l'image dans docs pour GitHub Pages
         run: |
-          IMAGE_URL="https://ton-domaine-ou-pages.github.io/ton-repo/artifacts/$IMAGE_NAME"
+          cp "artifacts/$IMAGE_NAME" "docs/$IMAGE_NAME"
+
+      - name: Uploader l'artefact image-generee
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-generee
+          path: artifacts/${{ env.IMAGE_NAME }}
+
+      - name: Commit et push vers le dépôt
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git diff --staged --quiet || git commit -m "chore: publish generated image ${IMAGE_NAME}"
+          git push
+
+      - name: Construire l'URL de l'image
+        run: |
+          IMAGE_URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/$IMAGE_NAME"
           echo "IMAGE_URL=$IMAGE_URL" >> $GITHUB_ENV
 
-      - name: Send Discord notification
+      - name: Envoyer la notification Discord
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
           curl -H "Content-Type: application/json" \
-            -X POST \
-            -d "{\"content\":\"📝 Commit: $COMMIT_MESSAGE\n📷 Image: $IMAGE_URL\"}" \
-            $DISCORD_WEBHOOK_URL
+               -X POST \
+               -d "{\"content\":\"📝 Commit : $COMMIT_MESSAGE\n📷 Image : $IMAGE_URL\"}" \
+               "$DISCORD_WEBHOOK_URL"
