@@ -15,3 +15,5 @@
 [![Langage principal](https://img.shields.io/github/languages/top/Zeteticien/mon-premier-workflow)](https://github.com/Zeteticien/mon-premier-workflow)
 
 Projet d'apprentissage autour de GitHub Actions, de l'automatisation et de la génération de badges dynamiques. test2
+
+[![triage-issues](https://github.com/OWNER/REPO/actions/workflows/triage-issues.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/triage-issues.yml) testexo6
