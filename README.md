@@ -4,8 +4,8 @@
 [![Stars](https://img.shields.io/github/stars/Zeteticien/mon-premier-workflow)](https://github.com/Zeteticien/mon-premier-workflow/stargazers)
 [![Dernier commit](https://img.shields.io/github/last-commit/Zeteticien/mon-premier-workflow)](https://github.com/Zeteticien/mon-premier-workflow/commits/main)
 
-[![Génération d'image et déploiement GitHub Pages](https://github.com/Zeteticien/mon-premier-workflow/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/Zeteticien/mon-premier-workflow/actions/workflows/build.yml)
-[![Notification Discord avec URL dynamique](https://github.com/Zeteticien/mon-premier-workflow/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Zeteticien/mon-premier-workflow/actions/workflows/tests.yml)
+[![Génération d'image et déploiement GitHub Pages](https://github.com/Zeteticien/mon-premier-workflow/actions/workflows/generate-image.yml/badge.svg?branch=main)](https://github.com/Zeteticien/mon-premier-workflow/actions/workflows/generate-image.yml)
+[![Notification Discord avec URL dynamique](https://github.com/Zeteticien/mon-premier-workflow/actions/workflows/discord-notification.yml/badge.svg?branch=main)](https://github.com/Zeteticien/mon-premier-workflow/actions/workflows/discord-notification.yml)
 [![Mise à jour badge commits](https://github.com/Zeteticien/mon-premier-workflow/actions/workflows/update-badge.yml/badge.svg?branch=main)](https://github.com/Zeteticien/mon-premier-workflow/actions/workflows/update-badge.yml)
 
 [![Commits](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Zeteticien/mon-premier-workflow/main/badges/badge.json)](https://github.com/Zeteticien/mon-premier-workflow/blob/main/badges/badge.json)
