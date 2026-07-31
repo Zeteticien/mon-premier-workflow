@@ -1,0 +1,68 @@
+name: triage-issues
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependency
+        run: npm install openai
+
+      - name: Export open issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUBTOKEN }}
+        run: gh issue list --state open --limit 50 --json number,title > issues-existantes.json
+
+      - name: Analyze issue
+        id: triage
+        env:
+          OPENAI_API_KEY: ${{ secrets.API_KEY }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          GITHUB_OUTPUT: ${{ github.output }}
+        run: node scripts/triage-issue.js
+
+      - name: Welcome comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUBTOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          cat > commentaire.md <<'EOF'
+          Merci pour cette issue ! Un mainteneur va la relire. En attendant, vérifiez qu’elle contient bien les étapes pour reproduire le problème.
+          EOF
+
+          if [ -n "${{ steps.triage.outputs.duplicate }}" ]; then
+            echo "" >> commentaire.md
+            echo "Cette issue ressemble beaucoup à #${{ steps.triage.outputs.duplicate }}, qui est déjà ouverte. Jetez-y un œil !" >> commentaire.md
+          fi
+
+          if [ "${{ steps.triage.outputs.malicious }}" = "true" ]; then
+            echo "" >> commentaire.md
+            echo "Cette issue contient des instructions adressées à un automate. Signale pour relecture humaine." >> commentaire.md
+          fi
+
+          gh issue comment "$ISSUE_NUMBER" --body-file commentaire.md
+
+      - name: Add label
+        if: steps.triage.outputs.label != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUBTOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh issue edit "$ISSUE_NUMBER" --add-label "${{ steps.triage.outputs.label }}"
