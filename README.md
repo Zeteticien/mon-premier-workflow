@@ -14,4 +14,4 @@
 [![Issues ouvertes](https://img.shields.io/github/issues/Zeteticien/mon-premier-workflow)](https://github.com/Zeteticien/mon-premier-workflow/issues)
 [![Langage principal](https://img.shields.io/github/languages/top/Zeteticien/mon-premier-workflow)](https://github.com/Zeteticien/mon-premier-workflow)
 
-Projet d'apprentissage autour de GitHub Actions, de l'automatisation et de la génération de badges dynamiques.
+Projet d'apprentissage autour de GitHub Actions, de l'automatisation et de la génération de badges dynamiques. test
