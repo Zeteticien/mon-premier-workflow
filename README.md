@@ -16,4 +16,4 @@
 
 Projet d'apprentissage autour de GitHub Actions, de l'automatisation et de la génération de badges dynamiques. test2
 
-[![triage-issues](https://github.com/OWNER/REPO/actions/workflows/triage-issues.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/triage-issues.yml)
+[![triage-issues](https://github.com/OWNER/REPO/actions/workflows/triage-issues.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/triage-issues.yml) testexo6
